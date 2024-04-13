@@ -1,0 +1,23 @@
+1. gcloud cli should be installed in local to run any gcloud command
+2. export GOOGLE_APPLICATION_CREDENTIALS="/home/magan/Downloads/gcp_project/credentials/ethereal-aria-416604-ffd2bf064dff.json" >> use this command to explicitly set the env. variables of service account
+
+3.python3 batch_processing_template.py --runner DataflowRunner --project ethereal-aria-416604 --region us-west1 --service_account_email demo-424@ethereal-aria-416604.iam.gserviceaccount.com --staging_location gs://magan/staging --temp_location gs://magan/temp --job_name project --num_workers 1 --max_num_workers 3 --temp_location gs://magan/temp --job_name project --num_workers 3 --max_num_workers 4 --template_location gs://magan/template/batchtemplate --save_main_session True
+
+python3 dataflow_batch_test.py --input_path=gs://magan/data/yelp_academic_dataset_business.json --table=test.business --error_table=test.error --runner DataflowRunner --project ethereal-aria-416604 --region us-west1 --service_account_email demo-424@ethereal-aria-416604.iam.gserviceaccount.com --staging_location gs://magan/staging --temp_location gs://magan/temp --job_name project --num_workers 3 --max_num_workers 4 --save_main_session True >> for directly triggering dataflow job
+
+
+4.python3 publish.py --config publish_config.ini >> publish messages to pubsub topic
+
+sample publish config file
+'''
+[gcp]
+project_id = ethereal-aria-416604
+topic_id = gcp-yelp-stream
+credentials_path = /home/magan/Downloads/gcp_project/credentials/ethereal-aria-416604-ffd2bf064dff.json
+file_path = /home/magan/Downloads/Beam/magan/employee_stream.json
+#file_path = /home/magan/Downloads/gcp_project/GCP_Data_Ingestion/Codes/Database/yelp_academic_dataset_covid_features.json
+'''
+
+5.python3 dataflow_stream_templated.py --input_subscription projects/ethereal-aria-416604/subscriptions/gcp-yelp-stream-sub --output_table test.yelp_covid --output_error_table project.error --runner DataflowRunner --project ethereal-aria-416604 --region us-west1 --staging_location gs://magan/staging --temp_location gs://magan/temp --num_workers 2 --max_num_workers 4 --template_location gs://magan/template/streamtemplate --save_main_session True
+
+python3 dataflow_stream_templated.py --input_subscription projects/ethereal-aria-416604/subscriptions/gcp-yelp-stream-sub --output_table test.yelp_covid --output_error_table project.error --runner DataflowRunner --project ethereal-aria-416604 --region us-west1 --staging_location gs://magan/staging --temp_location gs://magan/temp --num_workers 2 --max_num_workers 4 --save_main_session True
